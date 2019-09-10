@@ -18,8 +18,8 @@ public class RoleController {
 			@RequestParam String feederType) {
 		UserRoles userRoles = new UserRoles();
 		//HOW to identify the fileds of which table
-		String[] detailFields = { "IME_TRACE_ID", "MTI_FUNC_CD", "TRAN_TYPE_CD", "ISS_ICA_NUM", "ACQ_ICA_NUM" };
-		String[] asFields = { "IME", "FunctionCode", "TRXNTYPE", "IssuerICA", "AcuirerICA" };// we will get as this
+		String[] detailFields = { "IME_TRACE_ID", "MTI_FUNC_CD", "TRAN_TYPE_CD", "ISS_ICA_NUM", "ACQ_ICA_NUM","CARD_TYPE" };
+		String[] asFields = { "IME", "FunctionCode", "TRXNTYPE", "IssuerICA", "AcuirerICA","CardType" };// we will get as this
 		userRoles.setRoleName("BILL_OPS");
 		userRoles.setDetailFields(detailFields);
 		userRoles.setAsFields(asFields);

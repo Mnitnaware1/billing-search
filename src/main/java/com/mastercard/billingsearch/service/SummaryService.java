@@ -12,6 +12,6 @@ import com.mastercard.billingsearch.model.UserRoles;
 public interface SummaryService {
 	public List<CSVResponse> exportSummaryRecords(int count, CSVRequest csvRequest);
 
-	public List<Map<String, Object>> billingTransactionDetails(String feederType, UserRoles userRoles);
+	public List<Map<String, Object>> billingTransactionDetails(String feederType, UserRoles userRoles, int totalRecords);
 
 }

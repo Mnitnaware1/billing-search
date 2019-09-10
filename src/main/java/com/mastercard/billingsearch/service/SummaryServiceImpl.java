@@ -20,8 +20,8 @@ public class SummaryServiceImpl implements SummaryService {
 		return summaryRepository.getSummaryRecords(count,csvResponceDto);
 	}
 	@Override
-	public  List<Map<String, Object>> billingTransactionDetails(String feederType, UserRoles userRoles) {
-		return summaryRepository.getBillingTransactionDetails(feederType,userRoles);
+	public  List<Map<String, Object>> billingTransactionDetails(String feederType, UserRoles userRoles,int totalRecords) {
+		return summaryRepository.getBillingTransactionDetails(feederType,userRoles,totalRecords);
 	}
 
 	

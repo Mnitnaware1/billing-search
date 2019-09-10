@@ -82,17 +82,26 @@ public class BillingSummaryController {
 	}
 	// role -BILL_OPS
 	// feederType AUTH
-
+	/***
+	 * call to role API to get
+	 * UserRoles
+	 * 
+	 * @return billing Transaction Details
+	 */
 	@GetMapping(value = "details/{imeTraceId}")
 	public List<Map<String, Object>> billingTransactionDetail(@PathVariable("imeTraceId") String imeTraceId,
 			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId)
 			throws JsonProcessingException {
-
+		long startTime = System.currentTimeMillis(); 
 		URI requestURI = buildURLWithParameters(userId, feederType);
-
 		UserRoles userRoles = restTemplate.getForObject(requestURI, UserRoles.class);
 		// feederType used to form table name dynamically
-		return summaryService.billingTransactionDetails(feederType, userRoles);
+		 List<Map<String, Object>> billingTransactionDetails = summaryService.billingTransactionDetails(feederType, userRoles,rootConfiguration.getTotalRecords());
+		
+		 long end = System.currentTimeMillis(); 
+	        System.out.println("Counting takes " + 
+	                                    (end - startTime) + "ms"); 
+		 return billingTransactionDetails;
 	}
 
 	// this method builds uri with the given parameters

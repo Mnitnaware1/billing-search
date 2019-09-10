@@ -74,7 +74,14 @@
 			<artifactId>powermock-module-junit4</artifactId>
 			<version>1.7.0</version>
 		</dependency>
-		
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

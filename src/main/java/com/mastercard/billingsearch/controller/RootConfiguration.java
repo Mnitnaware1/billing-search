@@ -20,35 +20,29 @@ public class RootConfiguration {
 	@Value("${billingsummaryfile}")
 	private String billingSummaryFileName;
 	
+	@Value("${totalrecords}")
+	private int totalRecords;
+
 	public String getRoleApiUrl() {
 		return roleApiUrl;
 	}
-	
-	public void setRoleApiUrl(String roleApiUrl) {
-		this.roleApiUrl = roleApiUrl;
-	}
+
+
 	public String getSchemaFile() {
 		return schemaFile;
 	}
-	public void setSchemaFile(String schemaFile) {
-		this.schemaFile = schemaFile;
-	}
+
 
 	public String getMessage() {
 		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public String getBillingSummaryFileName() {
 		return billingSummaryFileName;
 	}
 
-	public void setBillingSummaryFileName(String billingSummaryFileName) {
-		this.billingSummaryFileName = billingSummaryFileName;
+	public int getTotalRecords() {
+		return totalRecords;
 	}
-	
 	
 }

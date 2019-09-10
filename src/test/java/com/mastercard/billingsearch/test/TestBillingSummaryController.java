@@ -113,7 +113,7 @@ public class TestBillingSummaryController {
 		List<Map<String, Object>> list=new ArrayList<>();
 		UserRoles userDetails = new UserRoles(2);
 		Mockito.when(restTemplate.getForObject(uri, UserRoles.class)).thenReturn(userDetails);
-		Mockito.when(summaryService.billingTransactionDetails(Mockito.anyString(),Mockito.any(UserRoles.class))).thenReturn(list);
+		Mockito.when(summaryService.billingTransactionDetails(Mockito.anyString(),Mockito.any(UserRoles.class),Mockito.anyInt())).thenReturn(list);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/details").accept(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();

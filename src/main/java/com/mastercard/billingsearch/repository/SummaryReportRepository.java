@@ -37,7 +37,8 @@ public class SummaryReportRepository {
 
 	}
 
-	public List<Map<String, Object>> getBillingTransactionDetails(String feederType, UserRoles userRoles) {
+	public List<Map<String, Object>> getBillingTransactionDetails(String feederType, UserRoles userRoles, int totalRecords) {
+		// TODO if detailFields and asFields are null
 		String[] detailFields = userRoles.getDetailFields();
 		String[] asFields = userRoles.getAsFields();
 
@@ -46,8 +47,9 @@ public class SummaryReportRepository {
 
 		String sqlQuery = "SELECT " + buildAsQuery + " FROM " + buildTableNamesUingFeederType
 				+ " WHERE bd.IME_TRACE_ID = td.IME_TRACE_ID";
-		jdbcTemplate.setMaxRows(50);
 		
+		System.err.println(sqlQuery);
+		jdbcTemplate.setMaxRows(50);
 		return jdbcTemplate.queryForList(sqlQuery);
 	}
 
