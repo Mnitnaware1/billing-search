@@ -1,7 +1,9 @@
 package com.mastercard.billingsearch.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,20 +20,27 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.mastercard.billingsearch.model.CSVRequest;
 import com.mastercard.billingsearch.model.CSVResponse;
 import com.mastercard.billingsearch.model.UserRoles;
 import com.mastercard.billingsearch.service.SummaryService;
+import com.mastercard.billingsearch.utility.Constants;
 import com.mastercard.billingsearch.utility.ExportCSV;
+import com.mastercard.billingsearch.utility.JsonSchemaValidator;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 @RestController
-@RequestMapping("/billing/summary")
-public class BillingSummaryController {
+public class BillingSummaryController2 {
+
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@Autowired
 	SummaryService summaryService;
@@ -45,15 +54,18 @@ public class BillingSummaryController {
 	 * 
 	 * @return billing summary downloaded csv
 	 */
-
+	
 	@PostMapping(value = "/download")
 	public ResponseEntity<Object> billingSummaryDownload(@RequestBody CSVRequest csvRequest,
 			@RequestHeader("userId") String userId, HttpServletResponse response) throws IOException,
 			ProcessingException, URISyntaxException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+		//TODO : get the download count for a specific role
 
-		// make a call to role_mapping table to get download count
-		String downloadSummaryCount = summaryService.downloadSummaryCount(userId);
-		List<CSVResponse> summaryReport = summaryService.exportSummaryRecords(Integer.parseInt(downloadSummaryCount),
+		URI requestURI = buildURLWithParameters(userId, csvRequest.getFeederType());
+
+		UserRoles userRoles = restTemplate.getForObject(requestURI, UserRoles.class);
+
+		List<CSVResponse> summaryReport = summaryService.exportSummaryRecords(1,
 				csvRequest);
 
 		ExportCSV.export(response, summaryReport, rootConfiguration.getBillingSummaryFileName());
@@ -61,11 +73,11 @@ public class BillingSummaryController {
 		return ResponseEntity.status(HttpStatus.OK).build();
 
 	}
-
 	// role -BILL_OPS
 	// feederType AUTH
 	/***
-	 * call to role API to get UserRoles
+	 * call to role API to get
+	 * UserRoles
 	 * 
 	 * @return billing Transaction Details
 	 */
@@ -73,24 +85,36 @@ public class BillingSummaryController {
 	public List<Map<String, Object>> billingTransactionDetail(@PathVariable("imeTraceId") String imeTraceId,
 			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId)
 			throws JsonProcessingException {
-
-		String roleName = summaryService.roleName(userId);
-		List<UserRoles> elementMappingDetails = summaryService.elementMappingDetails(roleName,feederType);
-		return summaryService.billingTransactionDetails(feederType, elementMappingDetails,
-				rootConfiguration.getTotalRecords());
-
+		
+		//TODO : get the as fields and detail fields feeder type and role
+		long startTime = System.currentTimeMillis(); 
+		URI requestURI = buildURLWithParameters(userId, feederType);
+		UserRoles userRoles = restTemplate.getForObject(requestURI, UserRoles.class);
+		// feederType used to form table name dynamically
+		 List<Map<String, Object>> billingTransactionDetails = null ;
+		 //summaryService.billingTransactionDetails(feederType, userRoles,rootConfiguration.getTotalRecords());
+		
+		 long end = System.currentTimeMillis(); 
+	        System.out.println("Counting takes " + 
+	                                    (end - startTime) + "ms"); 
+		 return billingTransactionDetails;
 	}
-
 	@GetMapping(value = "details/{imeTraceId}/download")
-	public ResponseEntity<Object> billingDetailsDownload(@PathVariable("imeTraceId") String imeTraceId,
-			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId,HttpServletResponse response)
-			throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
-		String roleName = summaryService.roleName(userId);
-		List<UserRoles> elementMappingDetails = summaryService.elementMappingDetails(roleName,feederType);
-		 List<Map<String, Object>> billingTransactionDetails = summaryService.billingTransactionDetails(feederType, elementMappingDetails,
-				rootConfiguration.getTotalRecords());
-		ExportCSV.exportCSV(response, billingTransactionDetails, rootConfiguration.getTransactiondetailfile());
-		return ResponseEntity.status(HttpStatus.OK).build();
+	public void billingDetailsDownload(@PathVariable("imeTraceId") String imeTraceId,
+			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId)
+			throws JsonProcessingException {
+		//TODO : get the download count for a specific role
 
+		
+	}
+	
+
+	// this method builds uri with the given parameters
+	private URI buildURLWithParameters(String userId, String feederType) {
+//		TODO this method will be removed
+		Map<String, String> urlParams = new HashMap<>();
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(rootConfiguration.getRoleApiUrl())
+				.queryParam("userId", userId).queryParam("feederType", feederType);
+		return builder.buildAndExpand(urlParams).toUri();
 	}
 }

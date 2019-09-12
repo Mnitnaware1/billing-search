@@ -1,28 +1,28 @@
 package com.mastercard.billingsearch.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class UserRoles {
-	private String roleName;
-	private String[] detailFields;
-	private String[] asFields;
-	private int downloadSummaryCount;
-	private String downloadDetailCount;
-	private String summaryResponseCount;
-	private String detailResponseCount;
+public class UserRoles implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String role;
+	private String elements;
+	private String asFields;
+	private char enable;
+
 
 	public UserRoles() {
 		super();
 	}
 
-	public UserRoles(int downloadSummaryCount) {
-		super();
-		this.downloadSummaryCount = downloadSummaryCount;
-	}
 
 	
 }

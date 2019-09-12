@@ -10,7 +10,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
 
 public class JsonSchemaValidator {
-	
+	/** @input file name and json data**/
 	public String validateJsonData(String jsonSchema,String jsonData)
 			throws IOException, ProcessingException {
 

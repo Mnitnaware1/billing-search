@@ -2,7 +2,6 @@ package com.mastercard.billingsearch.repository;
 
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,28 +27,22 @@ public class SummaryReportRepository {
 		String sqlQuery = "select * from charge_detail cd , charge_transaction_trace ct where cd.summary_trace_id=ct.billing_summary_trace_id and\r\n"
 				+ " cd.invoice_Date = ? AND cd.inv_num = ? AND cd.activity_ica =? AND ct.bill_event_id = ?";
 		jdbcTemplate.setMaxRows(count);
-		return jdbcTemplate.query(
-				sqlQuery, 
-				new Object[] { csvRequest.getInvoiceDate(), csvRequest.getInvoiceNumber(),
-						csvRequest.getActivityICA(), csvRequest.getBillEventId() },
-				
+		return jdbcTemplate.query(sqlQuery,
+				new Object[] { csvRequest.getInvoiceDate(), csvRequest.getInvoiceNumber(), csvRequest.getActivityICA(),
+						csvRequest.getBillEventId() },
 				new BeanPropertyRowMapper<CSVResponse>(CSVResponse.class));
-
 	}
 
-	public List<Map<String, Object>> getBillingTransactionDetails(String feederType, UserRoles userRoles, int totalRecords) {
-		// TODO if detailFields and asFields are null
-		String[] detailFields = userRoles.getDetailFields();
-		String[] asFields = userRoles.getAsFields();
-
+	public List<Map<String, Object>> getBillingTransactionDetails(String feederType, List<UserRoles> elementMappingDetail,
+			int totalRecords) {
+		// TODO if detailFields and asFields are nulls
+		Object[] detailFields = elementMappingDetail.stream().map(e->e.getElements()).toArray();
+		Object[] asFields = elementMappingDetail.stream().map(e->e.getAsFields()).toArray();
 		String buildAsQuery = buildAsQuery(detailFields, asFields);
 		String buildTableNamesUingFeederType = buildTableNamesUingFeederType(feederType);
-
 		String sqlQuery = "SELECT " + buildAsQuery + " FROM " + buildTableNamesUingFeederType
-				+ " WHERE bd.IME_TRACE_ID = td.IME_TRACE_ID";
-		
-		System.err.println(sqlQuery);
-		jdbcTemplate.setMaxRows(50);
+				+ " WHERE EVENT.IME_TRACE_ID = TRANSACTION.IME_TRACE_ID";
+		jdbcTemplate.setMaxRows(totalRecords);
 		return jdbcTemplate.queryForList(sqlQuery);
 	}
 
@@ -61,14 +54,14 @@ public class SummaryReportRepository {
 		return feederTypeStr.toString();
 	}
 
-	private String buildAsQuery(String[] detailFields, String[] asFields) {
+	private String buildAsQuery(Object[] detailFields, Object[] asFields) {
 		StringBuilder stringBuilder = new StringBuilder();
 
 		if (detailFields.length == asFields.length) {
 			for (int i = 0; i < asFields.length; i++) {
-				String asField = asFields[i];
-				String detailField = detailFields[i];
-				stringBuilder.append("td.").append(detailField).append(Constants.AS).append(asField);
+				Object asField =  asFields[i];
+				Object detailField =  detailFields[i];
+				stringBuilder.append(detailField).append(Constants.AS).append(asField);
 				if (i != asFields.length - 1) {
 					stringBuilder.append(Constants.COMMA);
 				}
@@ -78,6 +71,35 @@ public class SummaryReportRepository {
 
 		return "*";
 
+	}
+	
+	public String getDownloadSummaryCount(String userId){
+		String sqlQueryToFetchRoleName="SELECT download_summary_count FROM role_mapping where ROLE_NAME IN (SELECT ROLE_NAME FROM user_roles where user_id=?)";
+		 return jdbcTemplate.queryForObject(
+	                sqlQueryToFetchRoleName,
+	                new Object[]{userId},
+	                String.class
+	        );
+		
+	}
+
+	public String getRoleName(String userId) {
+		String sqlQueryToFetchRoleName="SELECT role_name FROM USER_ROLES where user_id=?";
+		 return jdbcTemplate.queryForObject(
+	                sqlQueryToFetchRoleName,
+	                new Object[]{userId},
+	                String.class
+	        );
+	}
+
+	public List<UserRoles> getElementMappingDetails(String roleName, String feederType) {
+		String sqlQueryToFetchRoleName="SELECT ELEMENTS,AS_FIELDS FROM ELEMENT_MAPPING WHERE role=? AND FEEDER_TYPE=? AND ENABLE='Y'";
+		
+		 return jdbcTemplate.query(
+	                sqlQueryToFetchRoleName,
+	                new Object[]{roleName,feederType},
+	                new BeanPropertyRowMapper<UserRoles>(UserRoles.class)
+	        ); 
 	}
 
 }

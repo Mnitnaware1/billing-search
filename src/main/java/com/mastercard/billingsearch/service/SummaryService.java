@@ -10,8 +10,14 @@ import com.mastercard.billingsearch.model.UserRoles;
 
 
 public interface SummaryService {
+	public String downloadSummaryCount(String userId);
+	
 	public List<CSVResponse> exportSummaryRecords(int count, CSVRequest csvRequest);
 
-	public List<Map<String, Object>> billingTransactionDetails(String feederType, UserRoles userRoles, int totalRecords);
+	public List<Map<String, Object>> billingTransactionDetails(String feederType, List<UserRoles> elementMappingDetails, int totalRecords);
+      public String roleName(String userId);
 
+	public List<UserRoles> elementMappingDetails(String roleName, String feederType);
+      
+ 
 }

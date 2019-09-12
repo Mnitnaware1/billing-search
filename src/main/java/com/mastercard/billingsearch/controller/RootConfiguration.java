@@ -22,6 +22,9 @@ public class RootConfiguration {
 	
 	@Value("${totalrecords}")
 	private int totalRecords;
+	
+	@Value("${transactiondetailfile}")
+	private String transactiondetailfile;
 
 	public String getRoleApiUrl() {
 		return roleApiUrl;
@@ -44,5 +47,11 @@ public class RootConfiguration {
 	public int getTotalRecords() {
 		return totalRecords;
 	}
+
+
+	public String getTransactiondetailfile() {
+		return transactiondetailfile;
+	}
+	
 	
 }

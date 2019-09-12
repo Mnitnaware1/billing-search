@@ -31,3 +31,37 @@ CONSTRAINT AUTH_TRANSACTION_DETAIL_PK PRIMARY KEY (IME_TRACE_ID)
 
 select  MTI_FUNC_CD, TRAN_TYPE_CD, ISS_ICA_NUM, ACQ_ICA_NUM from auth_billing_event_detail bd,
 auth_transaction_detail td where bd.IME_TRACE_ID=td.IME_TRACE_ID;
+
+===============
+CREATE TABLE USER_ROLES (
+   role_Name varchar(20),
+   role_Description varchar(100),
+   ICA varchar(20),
+   STATUS varchar(20),
+   user_Id varchar(20) NOT NULL,
+   PRIMARY KEY (user_Id)
+);
+
+=========
+CREATE TABLE ROLE_MAPPING (
+   role_Name varchar(20),
+   download_Detail_Count varchar(20),
+   download_Summary_Count varchar(20),
+   summary_Response_Count varchar(20),
+   detail_Response_Count varchar(20),
+   PRIMARY KEY (role_Name)
+);
+
+=======
+CREATE TABLE ELEMENT_MAPPING (
+   FEEDER_TYPE varchar(20),
+   ELEMENTS varchar(100),
+   ROLE varchar(20),
+   ENABLE CHAR(1),
+   AS_FIELDS varchar(20) NOT NULL
+);
+
+
+
+
+
