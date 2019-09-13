@@ -2,21 +2,25 @@ package com.mastercard.billingsearch.repository;
 
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import com.mastercard.billingsearch.model.UserRoles;
 import com.mastercard.billingsearch.utility.Constants;
+
 @Repository
 public class TransactionRepository {
+	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	
+	private String sqlQueryToFetchRoleName="SELECT ELEMENTS, AS_FIELDS FROM ELEMENT_MAPPING WHERE role=? AND FEEDER_TYPE=? AND ENABLE='Y'";
+
+	
 	public List<Map<String, Object>> getBillingTransactionDetails(String feederType, List<UserRoles> elementMappingDetail,
 			int totalRecords) {
-		// TODO if detailFields and asFields are nulls
+		// TODO if detailFields and asFields are NULL
 		Object[] detailFields = elementMappingDetail.stream().map(e->e.getElements()).toArray();
 		Object[] asFields = elementMappingDetail.stream().map(e->e.getAsFields()).toArray();
 		String buildAsQuery = buildAsQuery(detailFields, asFields);
@@ -56,7 +60,6 @@ public class TransactionRepository {
 	
 
 	public List<UserRoles> getElementMappingDetails(String roleName, String feederType) {
-		String sqlQueryToFetchRoleName="SELECT ELEMENTS,AS_FIELDS FROM ELEMENT_MAPPING WHERE role=? AND FEEDER_TYPE=? AND ENABLE='Y'";
 	
 		 return jdbcTemplate.query(
 	                sqlQueryToFetchRoleName,

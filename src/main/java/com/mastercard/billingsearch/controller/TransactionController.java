@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mastercard.billingsearch.config.RootConfiguration;
-import com.mastercard.billingsearch.model.UserRoles;
 import com.mastercard.billingsearch.service.TransactionService;
 import com.mastercard.billingsearch.utility.ExportCSV;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -27,8 +26,10 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 @RestController
 @RequestMapping("/billing/details")
 public class TransactionController {
+	
 	@Autowired
 	TransactionService transactionService;
+
 	@Autowired
 	private RootConfiguration rootConfiguration;
 
@@ -37,32 +38,27 @@ public class TransactionController {
 	 * @param feederType		 * 
 	 * @return billing Transaction Details
 	 */
+	@GetMapping(value = "{imeTraceId}")
+	public ResponseEntity<Object> billingTransactionDetail(@PathVariable("imeTraceId") String imeTraceId,
+			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId)
+					throws JsonProcessingException {
+		return new ResponseEntity<>(transactionService.billingTransactionDetails(feederType, userId,
+				rootConfiguration.getTotalRecords()), HttpStatus.OK);
+	}
+	
+	/***
+	 * @param imeTraceId
+	 * @param feederType		 
+	 * @return csv file
+	 */
+	@GetMapping(value = "{imeTraceId}/download")
+	public ResponseEntity<String> billingDetailsDownload(@PathVariable("imeTraceId") String imeTraceId,
+			@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId,HttpServletResponse response)
+					throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+		List<Map<String, Object>> billingTransactionDetails = transactionService.billingTransactionDetails(feederType, userId,
+				rootConfiguration.getTotalRecords());
+		ExportCSV.exportCSV(response, billingTransactionDetails, rootConfiguration.getTransactiondetailfile());
+		return ResponseEntity.status(HttpStatus.OK).build();
 
-		@GetMapping(value = "{imeTraceId}")
-		public ResponseEntity<Object> billingTransactionDetail(@PathVariable("imeTraceId") String imeTraceId,
-				@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId)
-				throws JsonProcessingException {
-			List<UserRoles> elementMappingDetails = transactionService.elementMappingDetails(userId,feederType);
-			
-	       return new ResponseEntity<>(transactionService.billingTransactionDetails(feederType, elementMappingDetails,
-			rootConfiguration.getTotalRecords()), HttpStatus.OK);
-
-		}
-		/***
-		 * @param imeTraceId
-		 * @param feederType		 
-		 * @return csv file
-		 */
-
-		@GetMapping(value = "{imeTraceId}/download")
-		public ResponseEntity<String> billingDetailsDownload(@PathVariable("imeTraceId") String imeTraceId,
-				@RequestParam("feederType") String feederType, @RequestHeader("userId") String userId,HttpServletResponse response)
-				throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
-			 List<UserRoles> elementMappingDetails = transactionService.elementMappingDetails(userId,feederType);
-			 List<Map<String, Object>> billingTransactionDetails = transactionService.billingTransactionDetails(feederType, elementMappingDetails,
-					rootConfiguration.getTotalRecords());
-			ExportCSV.exportCSV(response, billingTransactionDetails, rootConfiguration.getTransactiondetailfile());
-			return ResponseEntity.status(HttpStatus.OK).build();
-
-		}
+	}
 }

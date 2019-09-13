@@ -46,9 +46,7 @@ public class SummaryController {
 
 		List<CSVResponse> summaryReport = summaryService.exportSummaryRecords(userId,
 				csvRequest);
-
 		ExportCSV.export(response, summaryReport, rootConfiguration.getBillingSummaryFileName());
-
 		return ResponseEntity.status(HttpStatus.OK).build();
 
 	}

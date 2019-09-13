@@ -22,7 +22,7 @@ public class SummaryReportRepository {
 	 * @return summary records
 	 **/
 	public List<CSVResponse> getSummaryRecords(int count, CSVRequest csvRequest) {
-		String sqlQuery = "select * from charge_detail cd , charge_transaction_trace ct where cd.summary_trace_id=ct.billing_summary_trace_id and\r\n"
+		String sqlQuery = "SELECT * FROM charge_detail cd , charge_transaction_trace ct WHERE cd.summary_trace_id=ct.billing_summary_trace_id and\r\n"
 				+ " cd.invoice_Date = ? AND cd.inv_num = ? AND cd.activity_ica =? AND ct.bill_event_id = ?";
 		jdbcTemplate.setMaxRows(count);
 		return jdbcTemplate.query(sqlQuery,
